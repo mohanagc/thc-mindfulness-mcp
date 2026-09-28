@@ -14,12 +14,12 @@
  * to accidentally leak even under a broad query. Do not "helpfully" expand
  * this tool's scope later without re-reading this comment.
  */
-import { getJson } from "../lib/apiClient.js";
-import { resourceMatchesQuery, textIncludes } from "../lib/filters.js";
-import { fromPanchaVikas, type McpResource } from "../lib/normalize.js";
-import { findPanchavikasResourcesInput, type FindPanchavikasResourcesInput } from "../schemas.js";
-import type { ApiPanchaVikasResource, ApiSuccessList } from "../types.js";
-import { DEFAULT_RESULT_LIMIT } from "../lib/constants.js";
+import { getJson } from "../lib/apiClient";
+import { resourceMatchesQuery, textIncludes } from "../lib/filters";
+import { fromPanchaVikas, type McpResource } from "../lib/normalize";
+import { findPanchavikasResourcesInput, type FindPanchavikasResourcesInput } from "../schemas";
+import type { ApiPanchaVikasResource, ApiSuccessList } from "../types";
+import { DEFAULT_RESULT_LIMIT } from "../lib/constants";
 
 export const findPanchavikasResourcesTool = {
   name: "find_panchavikas_resources",

@@ -16,7 +16,7 @@ import type {
   ApiPractice,
   ApiResearchCitation,
   ApiResource,
-} from "../types.js";
+} from "../types";
 
 /** The public MCP resource model described in the project spec. */
 export interface McpResource {

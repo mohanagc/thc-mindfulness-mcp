@@ -5,7 +5,7 @@ import {
   MCP_REPO_URL,
   PROVIDER_NAME,
   SERVER_TITLE,
-} from "../src/lib/constants.js";
+} from "../src/lib/constants";
 
 const linkStyle: React.CSSProperties = { color: "#c9a96e", textDecoration: "none" };
 

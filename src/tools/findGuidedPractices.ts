@@ -11,12 +11,12 @@
  * GET /v1/search filtered to type === "guided_practice" when supplied, since
  * /v1/practices itself has no free-text parameter.
  */
-import { getJson } from "../lib/apiClient.js";
-import { durationFits } from "../lib/filters.js";
-import { fromPractice, fromUnifiedResource, type McpResource } from "../lib/normalize.js";
-import { findGuidedPracticesInput, type FindGuidedPracticesInput } from "../schemas.js";
-import type { ApiPractice, ApiResource, ApiSuccessList } from "../types.js";
-import { DEFAULT_RESULT_LIMIT, MAX_RESULT_LIMIT } from "../lib/constants.js";
+import { getJson } from "../lib/apiClient";
+import { durationFits } from "../lib/filters";
+import { fromPractice, fromUnifiedResource, type McpResource } from "../lib/normalize";
+import { findGuidedPracticesInput, type FindGuidedPracticesInput } from "../schemas";
+import type { ApiPractice, ApiResource, ApiSuccessList } from "../types";
+import { DEFAULT_RESULT_LIMIT, MAX_RESULT_LIMIT } from "../lib/constants";
 
 export const findGuidedPracticesTool = {
   name: "find_guided_practices",

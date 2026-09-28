@@ -16,12 +16,12 @@
  *
  * This tool must NEVER invent a definition for a term the API doesn't have.
  */
-import { getJson } from "../lib/apiClient.js";
-import { AppError } from "../lib/errors.js";
-import { slugify } from "../lib/filters.js";
-import { fromGlossaryTerm, fromUnifiedResource, type McpResource } from "../lib/normalize.js";
-import { lookupMindfulnessTermInput, type LookupMindfulnessTermInput } from "../schemas.js";
-import type { ApiGlossaryTerm, ApiResource, ApiSuccessDetail, ApiSuccessList } from "../types.js";
+import { getJson } from "../lib/apiClient";
+import { AppError } from "../lib/errors";
+import { slugify } from "../lib/filters";
+import { fromGlossaryTerm, fromUnifiedResource, type McpResource } from "../lib/normalize";
+import { lookupMindfulnessTermInput, type LookupMindfulnessTermInput } from "../schemas";
+import type { ApiGlossaryTerm, ApiResource, ApiSuccessDetail, ApiSuccessList } from "../types";
 
 export const lookupMindfulnessTermTool = {
   name: "lookup_mindfulness_term",

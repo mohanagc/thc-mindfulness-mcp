@@ -12,11 +12,11 @@
  * only the summary/key_finding/limitations text the API itself already
  * provides, and never adds interpretive claims on top of it.
  */
-import { getJson } from "../lib/apiClient.js";
-import { fromResearch, fromUnifiedResource, type McpResource } from "../lib/normalize.js";
-import { searchMindfulnessResearchInput, type SearchMindfulnessResearchInput } from "../schemas.js";
-import type { ApiResearchCitation, ApiResource, ApiSuccessList } from "../types.js";
-import { DEFAULT_RESULT_LIMIT, MAX_RESULT_LIMIT } from "../lib/constants.js";
+import { getJson } from "../lib/apiClient";
+import { fromResearch, fromUnifiedResource, type McpResource } from "../lib/normalize";
+import { searchMindfulnessResearchInput, type SearchMindfulnessResearchInput } from "../schemas";
+import type { ApiResearchCitation, ApiResource, ApiSuccessList } from "../types";
+import { DEFAULT_RESULT_LIMIT, MAX_RESULT_LIMIT } from "../lib/constants";
 
 export const searchMindfulnessResearchTool = {
   name: "search_mindfulness_research",

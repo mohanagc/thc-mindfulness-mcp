@@ -12,8 +12,8 @@ import {
   UNIFIED_RESOURCE_TYPES,
   WHITEPAPER_STUDY_TYPES,
   WHITEPAPER_TOPICS,
-} from "./types.js";
-import { MAX_QUERY_LENGTH, MAX_RESULT_LIMIT } from "./lib/constants.js";
+} from "./types";
+import { MAX_QUERY_LENGTH, MAX_RESULT_LIMIT } from "./lib/constants";
 
 const query = z
   .string()

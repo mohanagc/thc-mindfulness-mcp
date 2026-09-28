@@ -8,12 +8,12 @@
  * pretended to be server-side facets. This is deliberately documented in the
  * tool description below so a calling model understands the limitation.
  */
-import { getJson } from "../lib/apiClient.js";
-import { ageRangeCovers, textIncludes } from "../lib/filters.js";
-import { fromUnifiedResource, type McpResource } from "../lib/normalize.js";
-import { searchMindfulnessResourcesInput, type SearchMindfulnessResourcesInput } from "../schemas.js";
-import type { ApiResource, ApiSuccessList } from "../types.js";
-import { DEFAULT_RESULT_LIMIT, MAX_RESULT_LIMIT } from "../lib/constants.js";
+import { getJson } from "../lib/apiClient";
+import { ageRangeCovers, textIncludes } from "../lib/filters";
+import { fromUnifiedResource, type McpResource } from "../lib/normalize";
+import { searchMindfulnessResourcesInput, type SearchMindfulnessResourcesInput } from "../schemas";
+import type { ApiResource, ApiSuccessList } from "../types";
+import { DEFAULT_RESULT_LIMIT, MAX_RESULT_LIMIT } from "../lib/constants";
 
 export const searchMindfulnessResourcesTool = {
   name: "search_mindfulness_resources",

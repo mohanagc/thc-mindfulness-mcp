@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SERVER_TITLE } from "../src/lib/constants.js";
+import { SERVER_TITLE } from "../src/lib/constants";
 
 export const metadata: Metadata = {
   title: SERVER_TITLE,

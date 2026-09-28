@@ -1,4 +1,4 @@
-import { SERVER_VERSION } from "../../src/lib/constants.js";
+import { SERVER_VERSION } from "../../src/lib/constants";
 
 export const runtime = "nodejs";
 

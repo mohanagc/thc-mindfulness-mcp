@@ -1,16 +1,16 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/server";
-import { logToolCall } from "../lib/logger.js";
-import { AppError } from "../lib/errors.js";
-import type { McpResource } from "../lib/normalize.js";
+import { logToolCall } from "../lib/logger";
+import { AppError } from "../lib/errors";
+import type { McpResource } from "../lib/normalize";
 
-import { searchMindfulnessResourcesTool } from "./searchMindfulnessResources.js";
-import { getMindfulnessResourceTool } from "./getMindfulnessResource.js";
-import { findMindfulnessGamesTool } from "./findMindfulnessGames.js";
-import { findGuidedPracticesTool } from "./findGuidedPractices.js";
-import { searchMindfulnessResearchTool } from "./searchMindfulnessResearch.js";
-import { lookupMindfulnessTermTool } from "./lookupMindfulnessTerm.js";
-import { findPanchavikasResourcesTool } from "./findPanchavikasResources.js";
+import { searchMindfulnessResourcesTool } from "./searchMindfulnessResources";
+import { getMindfulnessResourceTool } from "./getMindfulnessResource";
+import { findMindfulnessGamesTool } from "./findMindfulnessGames";
+import { findGuidedPracticesTool } from "./findGuidedPractices";
+import { searchMindfulnessResearchTool } from "./searchMindfulnessResearch";
+import { lookupMindfulnessTermTool } from "./lookupMindfulnessTerm";
+import { findPanchavikasResourcesTool } from "./findPanchavikasResources";
 
 /** Shared output schema for every list-returning tool. */
 const resourceOutputSchema = z.object({

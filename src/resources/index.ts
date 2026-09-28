@@ -14,7 +14,7 @@ import {
   MCP_REPO_URL,
   OPENAPI_URL,
   PROVIDER_NAME,
-} from "../lib/constants.js";
+} from "../lib/constants";
 
 function textResource(uri: string, mimeType: string, text: string) {
   return { contents: [{ uri, mimeType, text }] };

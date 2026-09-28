@@ -1,4 +1,4 @@
-import type { McpResource } from "./normalize.js";
+import type { McpResource } from "./normalize";
 
 /** Case-insensitive substring match, tolerant of undefined haystacks. */
 export function textIncludes(haystack: string | undefined, needle: string): boolean {

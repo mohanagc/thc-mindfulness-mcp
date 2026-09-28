@@ -10,12 +10,12 @@
  * over whichever batch was fetched — never inferred when the game's own
  * metadata doesn't state an age range or duration.
  */
-import { getJson } from "../lib/apiClient.js";
-import { ageRangeCovers, durationFits, textIncludes } from "../lib/filters.js";
-import { fromGame, fromUnifiedResource, type McpResource } from "../lib/normalize.js";
-import { findMindfulnessGamesInput, type FindMindfulnessGamesInput } from "../schemas.js";
-import type { ApiMindfulnessGame, ApiResource, ApiSuccessList } from "../types.js";
-import { DEFAULT_RESULT_LIMIT, MAX_RESULT_LIMIT } from "../lib/constants.js";
+import { getJson } from "../lib/apiClient";
+import { ageRangeCovers, durationFits, textIncludes } from "../lib/filters";
+import { fromGame, fromUnifiedResource, type McpResource } from "../lib/normalize";
+import { findMindfulnessGamesInput, type FindMindfulnessGamesInput } from "../schemas";
+import type { ApiMindfulnessGame, ApiResource, ApiSuccessList } from "../types";
+import { DEFAULT_RESULT_LIMIT, MAX_RESULT_LIMIT } from "../lib/constants";
 
 export const findMindfulnessGamesTool = {
   name: "find_mindfulness_games",

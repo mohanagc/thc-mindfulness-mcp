@@ -11,9 +11,9 @@ import {
   SERVER_NAME,
   SERVER_TITLE,
   SERVER_VERSION,
-} from "./lib/constants.js";
-import { registerAllTools } from "./tools/index.js";
-import { registerAllResources } from "./resources/index.js";
+} from "./lib/constants";
+import { registerAllTools } from "./tools/index";
+import { registerAllResources } from "./resources/index";
 
 export function buildMcpServer(): McpServer {
   const server = new McpServer(

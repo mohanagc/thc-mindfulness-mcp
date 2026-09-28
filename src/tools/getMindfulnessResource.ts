@@ -18,8 +18,8 @@
  * "does not exist," so it cannot be used to enumerate private content by
  * probing.
  */
-import { getJson } from "../lib/apiClient.js";
-import { notFound } from "../lib/errors.js";
+import { getJson } from "../lib/apiClient";
+import { notFound } from "../lib/errors";
 import {
   fromBlog,
   fromGame,
@@ -28,8 +28,8 @@ import {
   fromPractice,
   fromResearch,
   type McpResource,
-} from "../lib/normalize.js";
-import { getMindfulnessResourceInput, type GetMindfulnessResourceInput } from "../schemas.js";
+} from "../lib/normalize";
+import { getMindfulnessResourceInput, type GetMindfulnessResourceInput } from "../schemas";
 import type {
   ApiBlogSummary,
   ApiGlossaryTerm,
@@ -39,7 +39,7 @@ import type {
   ApiResearchCitation,
   ApiSuccessDetail,
   ApiSuccessList,
-} from "../types.js";
+} from "../types";
 
 export const getMindfulnessResourceTool = {
   name: "get_mindfulness_resource",

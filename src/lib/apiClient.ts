@@ -2,15 +2,15 @@ import {
   DEFAULT_API_BASE_URL,
   UPSTREAM_MAX_RETRIES,
   UPSTREAM_TIMEOUT_MS,
-} from "./constants.js";
+} from "./constants";
 import {
   internalError,
   notFound,
   upstreamBadRequest,
   upstreamUnavailable,
   type AppError,
-} from "./errors.js";
-import type { ApiErrorBody } from "../types.js";
+} from "./errors";
+import type { ApiErrorBody } from "../types";
 
 /**
  * Centralized REST API client. This is the ONLY place in the codebase that is

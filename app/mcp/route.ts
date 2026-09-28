@@ -18,7 +18,7 @@
  *    local development only) — never a wildcard.
  */
 import { createMcpHandler, hostHeaderValidationResponse, originValidationResponse } from "@modelcontextprotocol/server";
-import { buildMcpServer } from "../../src/server.js";
+import { buildMcpServer } from "../../src/server";
 
 const PRODUCTION_HOSTNAME = "mcp.theholisticcare.com";
 
