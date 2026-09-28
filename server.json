@@ -1,0 +1,17 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+  "name": "io.github.mohanagc/thc-open-mindfulness",
+  "description": "Public, read-only MCP server for The Holistic Care's mindfulness resources: games, free guided practices, research citations, glossary terms, and PanchaVikas framework overviews. Backed entirely by the public REST API at api.theholisticcare.com — no Sanity, database, or payment access.",
+  "version": "1.0.0",
+  "websiteUrl": "https://www.theholisticcare.com/developers",
+  "repository": {
+    "url": "https://github.com/mohanagc/thc-mindfulness-mcp",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.theholisticcare.com/mcp"
+    }
+  ]
+}

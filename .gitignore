@@ -1,0 +1,29 @@
+# Dependencies
+/node_modules
+
+# Next.js build output
+/.next/
+/out/
+next-env.d.ts
+
+# Env files — never commit real secrets. V1 needs none, but keep the guard anyway.
+.env
+.env.*
+!.env.example
+
+# Test/coverage output
+/coverage
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS/editor cruft
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+
+# Vercel
+.vercel

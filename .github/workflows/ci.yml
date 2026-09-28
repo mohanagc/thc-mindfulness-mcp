@@ -1,0 +1,52 @@
+name: CI
+
+# Runs on every push and pull request against main. Never runs the
+# production smoke test here — that script makes real network calls against
+# a live, deployed MCP endpoint and is meant to be run manually (or from a
+# separate post-deploy job) after a real Vercel deployment exists.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    name: Typecheck, lint, unit tests, build, registry validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          # No package-lock.json is committed yet (see HANDOFF.md — the
+          # sandbox this project was built in could not complete a clean
+          # `npm install` to generate one). Once one is committed, add
+          # `cache: "npm"` back here and switch the install step below to
+          # `npm ci` for stronger reproducibility.
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit + contract tests (all network calls mocked)
+        run: npm test
+
+      - name: Validate MCP registry metadata (server.json)
+        run: npm run validate:registry
+
+      - name: Build
+        run: npm run build
+        env:
+          # The build must succeed without any real secrets — this server
+          # has none (no Sanity token, no database credentials, no API keys
+          # of any kind; see HANDOFF.md's security boundary section).
+          NODE_ENV: production
