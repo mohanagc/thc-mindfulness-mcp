@@ -30,11 +30,12 @@ A public, read-only MCP (Model Context Protocol) server that wraps The Holistic 
 | Tests: in-process MCP protocol contract test | ✅ Done — `tests/contract.test.ts`, connects a real SDK `Client` to the real `buildMcpServer()` output over `InMemoryTransport` (no HTTP), verifies tools/list, resources/list, tools/call (success + error), resources/read, and zero-prompts behavior |
 | Production smoke script | ✅ Written — `scripts/smoke-production.mts`, makes REAL requests to a deployed MCP endpoint via the SDK's `StreamableHTTPClientTransport`; deliberately NOT run yet (nothing is deployed) and NOT part of CI |
 | CI (GitHub Actions) | ✅ Done — `.github/workflows/ci.yml` (typecheck, lint, unit+contract tests, `validate:registry`, build), plus `eslint.config.mjs` + `eslint`/`eslint-config-next` devDependencies added since `next lint` was removed in this Next.js version (16.3.6 — confirmed by absence of `next-lint.js` in `node_modules/next/dist/cli`); `package.json`'s `lint` script fixed to `eslint .` accordingly |
-| Git init / push to GitHub | ⚠️ Partially done, blocked — see "Real verification performed" and "Known limitations" below. `git init` + `git add -A` succeeded (all real project files staged, `node_modules`/`.next` correctly excluded per `.gitignore`); `git commit` is blocked by a stuck `.git/index.lock` this sandbox cannot remove (`Operation not permitted` — a filesystem-lock quirk of this Windows-mounted drive, not a code issue). The GitHub repo `mohanagc/thc-mindfulness-mcp` also still needs to be created (confirmed not to exist), and this sandbox has zero GitHub credentials regardless (`git ls-remote` fails: "could not read Username for 'https://github.com'"). |
-| Vercel project + deployment | ⏳ Not started |
-| Custom domain `mcp.theholisticcare.com` | ⏳ Not started |
-| Production smoke verification | ⏳ Not started |
-| Registry submission | ⛔ Explicitly out of scope for this build — see below |
+| Git init / push to GitHub | ✅ Done — repo pushed to `github.com/mohanagc/thc-mindfulness-mcp` (deployed via Vercel CLI directly from the local project folder rather than the GitHub-App auto-deploy integration; the `mohanagc` GitHub account was flagged, restricting third-party OAuth app authorization — a real, partial fix was observed [Vercel's GitHub "Connect" button now fires real network requests, vs. zero before] but the connection still does not fully complete, so **there is currently no auto-deploy-on-push wired up** — every future deploy needs a manual `vercel --prod` from a machine with the Vercel CLI logged in, until this is revisited). |
+| Vercel project + deployment | ✅ Done — project `thc-mindfulness-mcp` under team `mohans-projects-dc949787`, deployed via `vercel --prod` (CLI-based, see above). Live at `https://thc-mindfulness-mcp.vercel.app`. |
+| Custom domain `mcp.theholisticcare.com` | ✅ Done (2026-09-28) — added as a Vercel domain (Production environment), DNS configured in Cloudflare as a `CNAME` record (`mcp` → `004df1d37b12e7e5.vercel-dns-016.com`, **DNS only** / not proxied — matching the existing `api.theholisticcare.com` convention, since this is a standalone Vercel-hosted app, not something needing Cloudflare-specific routing). Vercel shows **Valid Configuration** with SSL issued. `GET https://mcp.theholisticcare.com/health` confirmed returning `{"status":"ok","service":"thc-open-mindfulness-mcp","version":"1.0.0"}` via a server-side fetch from outside this local network. |
+| Production smoke verification | ✅ Done (2026-09-29) — Mohan ran `npm run smoke:production` from his own machine (VS Code PowerShell) once his local DNS resolver caught up (took roughly a day for his specific ISP resolver, `2401:4900:50:9::7d5`, to refresh, even though Google's `8.8.8.8` and his browser had already resolved the record hours earlier). **All 6 checks passed**: `GET /health` returns 200 with status ok; MCP initialize handshake succeeds; `tools/list` returns exactly the 7 documented tools; `resources/list` returns exactly the 5 documented resources; `tools/call search_mindfulness_resources` succeeds against the live upstream API; `resources/read thc://about` returns non-empty text; live server exposes zero prompts (capability unsupported, as designed). The MCP server is confirmed fully live and functional end-to-end at `https://mcp.theholisticcare.com/mcp`. |
+| GitHub account restriction | ✅ Resolved (2026-09-29) — GitHub Support (Ticket 4801272) confirmed the account-level flag was cleared entirely. Re-tested by connecting `thc-mindfulness-mcp` to Vercel via the GitHub App: succeeded immediately ("Connected just now"). **Auto-deploy-on-push is now wired up for this repo** — the "manual `vercel --prod` only" limitation noted just above (line 33) no longer applies going forward, though manual deploys still work fine as a fallback. |
+| Registry submission | 🟡 Validated, NOT submitted (2026-09-29) — `server.json` passed both this repo's offline check and the real `mcp-publisher validate` against the live official registry schema. DNS domain-verification, login, and publish are the only steps left, all deliberately not started — see "Session log: 2026-09-29" below. |
 
 ## Real verification performed (this session — supersedes the earlier "believed correct, unexecuted" caveat)
 
@@ -146,6 +147,148 @@ eslint.config.mjs         Standard Next.js flat config (next/core-web-vitals + n
 6. Run `npm run smoke:production` (real network calls against the live deployed URL) and an MCP Inspector session against the live endpoint.
 7. Update this file with the outcome of each of the above.
 8. Deliver the final 19-point report to Mohan per the original spec (architecture, SDK/version, transport, tools, resources, REST endpoints used, security boundary, test results, Inspector result, registry validation result, GitHub status, Vercel status, custom domain status, production smoke status, licensing status, known limitations, anything requiring manual action, next steps).
+
+## Session log: 2026-09-28 — custom domain wired up, deployment confirmed live
+
+Picking up where an earlier session left off (Vercel project already deployed via CLI at `https://thc-mindfulness-mcp.vercel.app`, since the `mohanagc` GitHub account's OAuth-authorization restriction was blocking the normal GitHub-App auto-deploy connection to Vercel).
+
+**GitHub OAuth restriction: re-checked, partially improved, not fully resolved.** Mohan asked to re-verify whether the "flagged, cannot authorize third-party applications" restriction had cleared (per two screenshots: a GitHub Support reinstatement-related email thread, and a normal-looking GitHub dashboard). Checked `github.com/settings/applications` (clean — no authorized OAuth apps) and empirically re-tested Vercel's own "Connect GitHub" button: it now fires real `github-limited`/`github-token` network requests (200 OK), a genuine change from before (previously zero network activity on the same click). However, after the click and a page reload, GitHub still does **not** show as connected on the Vercel account — the connection does not fully complete. Also found an already-installed Vercel GitHub App (installation id `104483982`, "All repositories" access) sitting in a "Permission updates requested" state; deliberately left this untouched rather than approving/changing it blind, since it may be tied to the already-working production `theholisticcare.com` deploy pipeline and the risk of disrupting that wasn't worth it for this task. **Net: still no fully-working GitHub↔Vercel connection for this repo — deploys remain manual (`vercel --prod`) until this is revisited, ideally with Mohan present to confirm which GitHub App connection is safe to touch.**
+
+**Custom domain setup — completed.**
+1. Added `mcp.theholisticcare.com` as a domain on the `thc-mindfulness-mcp` Vercel project (Production environment). Vercel returned the required DNS record: `CNAME`, name `mcp`, value `004df1d37b12e7e5.vercel-dns-016.com.` (Vercel's newer per-project CNAME-target format; the older `cname.vercel-dns.com` / `76.76.21.21` would also still work per Vercel's own UI note).
+2. Added that record in Cloudflare (`theholisticcare.com` zone) via the dashboard: Type `CNAME`, Name `mcp`, Target `004df1d37b12e7e5.vercel-dns-016.com`, **Proxy status: DNS only** (not proxied) — deliberately matching the existing `api.theholisticcare.com` record's convention, since `mcp.theholisticcare.com` is structurally the same thing (a standalone Vercel-hosted app serving real content directly), not something that needs Cloudflare's own routing/redirect features the way `foundation`/`knowledge` subdomains do.
+   - **UI note for any future session doing this again:** Cloudflare's "Add record" Type dropdown in the "Add record" modal is a custom-rendered combobox, not a native `<select>`. Coordinate-based clicks on a freshly-opened option list were unreliable across several attempts (the click either silently failed to register, selected the wrong option because the list had re-rendered at different coordinates between the screenshot and the click, or dismissed the whole modal). The reliable method: click the combobox open, then use keyboard type-ahead (e.g. press `c` then `n` for "CNAME") followed by `Escape` to close the still-open list without changing the selection — this worked immediately and consistently. Also: `form_input` (setting an input's value directly via its element ref) was more reliable than a coordinate click + `type` for the plain text "Name" field, which didn't register a click-then-type sequence correctly on the first two attempts.
+3. Confirmed via Vercel's dashboard: DNS validated (blue checkmark), then "Generating SSL Certificate" (took roughly 20-30 seconds), then **"Valid Configuration."**
+4. Verified live: `mcp__workspace__web_fetch` against `https://mcp.theholisticcare.com/health` returned `{"status":"ok","service":"thc-open-mindfulness-mcp","version":"1.0.0"}` — confirming the custom domain is fully live and correctly routed to the deployed app, independent of this local machine's own DNS cache.
+
+**Full MCP-protocol smoke test: attempted, blocked by environment limits, not a server problem.**
+- `npm run smoke:production` failed in this sandbox with an `esbuild`/`tsx` platform mismatch (`node_modules` on this Windows-mounted drive only has the `@esbuild/win32-x64` binary; this sandbox's shell runs Linux). Installing the missing `@esbuild/linux-x64` package timed out.
+- Worked around by writing a plain `.mjs` equivalent of `scripts/smoke-production.mts` (importing the SDK's already-compiled JS directly, no TypeScript/tsx needed) and running it with plain `node` — but this sandbox's own shell has **no general internet egress at all** (confirmed: a raw `curl` to `mcp.theholisticcare.com` and even to `api.theholisticcare.com` both returned exit code 56 / connect failure; only specific allow-listed tools like `mcp__workspace__web_fetch` have a real network path out). The script's own `fetch` calls failed with `fetch failed` accordingly — this is a sandbox capability gap, not a finding about the deployed server.
+- Also tried running the check via the browser (Claude in Chrome / the real local Windows machine's Chrome), which does have real internet access — but hit `DNS_PROBE_FINISHED_NXDOMAIN` repeatedly (confirmed via `document.title`/`document.body.innerText` read directly, since the browser tool's own screenshot/page-text helpers refuse to run against an error page). This is because the CNAME record is brand new (added minutes earlier in this same session) and the local machine's/ISP's DNS resolver simply hadn't picked it up yet at the time of testing — an ordinary propagation-lag issue, not a server misconfiguration, especially since `mcp__workspace__web_fetch`'s separate resolver path already saw the record correctly at the same time.
+- **Net result: the plain HTTP health check is confirmed working against the real production custom domain. The full protocol-level check (`tools/list` returns exactly the 7 documented tools, `resources/list` returns exactly the 5 documented resources, a real `tools/call` against the live upstream API succeeds, a `resources/read` succeeds, zero prompts are exposed) was written and is ready to run, but was not completed in this session.** Recommend Mohan run `npm run smoke:production` from his own machine (where `node_modules` has the correct native binaries for his own OS and real internet access) once his local DNS has caught up — this should typically be within a few minutes given the CNAME's TTL, and is very likely already resolved by the time this is read.
+
+**Not done in this session (unchanged from before, still open):** fixing the GitHub↔Vercel auto-deploy connection for real; MCP directory/registry submissions (explicitly out of scope per the original task spec — do not start this without being asked); resolving the still-pending "Permission updates requested" state on the existing Vercel GitHub App installation (deliberately left untouched, flagged for Mohan's own review since it may affect the live `theholisticcare.com` site's own deploy pipeline, not just this project).
+
+## Session log: 2026-09-29 — production smoke test fully passed, DNS propagation resolved
+
+Follow-up to the 2026-09-28 session above. The custom domain and health endpoint were already confirmed live; the only remaining gap was the full MCP-protocol smoke test, blocked by the brand-new CNAME record not yet having propagated to Mohan's local ISP resolver.
+
+**Propagation timeline observed:** Google's public resolver (`8.8.8.8`) and Mohan's own browser (Chrome, via `mcp.theholisticcare.com` and `/health` both rendering correctly) resolved the record correctly within hours of it being added. Mohan's specific ISP resolver (`2401:4900:50:9::7d5`), used by default `nslookup`/`curl.exe`/Node's `fetch` on his machine, took roughly a full day longer to refresh its cache — `nslookup mcp.theholisticcare.com` (no server specified) kept returning "Non-existent domain" well after the browser and `8.8.8.8` both worked, and `npm run smoke:production` failed with generic `fetch failed` on both checks during that window, purely because Node's DNS resolution went through the same lagging local resolver. This is a good example of why a passing browser check doesn't guarantee a CLI/Node tool will also work immediately — different resolution paths can be out of sync with each other for a while after a new record is added.
+
+**Resolved itself with time, no configuration change needed.** Mohan retried periodically; once `nslookup mcp.theholisticcare.com` finally returned a real address instead of NXDOMAIN, `npm run smoke:production` was re-run from his own machine (VS Code PowerShell, `E:\thc-mindfulness-mcp`) and passed cleanly:
+
+```
+ok - GET /health returns 200 with status: ok
+ok - MCP initialize handshake succeeds
+ok - tools/list returns exactly the 7 documented tools
+ok - resources/list returns exactly the 5 documented resources
+ok - tools/call search_mindfulness_resources succeeds against live upstream API
+ok - resources/read thc://about returns non-empty text
+ok - live server exposes zero prompts (capability unsupported)
+
+All checks passed against https://mcp.theholisticcare.com/mcp
+```
+
+**This closes out production smoke verification in full.** The MCP server is now confirmed live and fully functional end-to-end at `https://mcp.theholisticcare.com/mcp`: custom domain live with valid SSL, health check passing, full MCP protocol handshake working, exactly the 7 documented tools and 5 documented resources exposed, a real tool call succeeding against the live upstream REST API, a resource read succeeding, and zero prompts exposed (as designed for this V1 scope).
+
+**Still open, unchanged from the 2026-09-28 log:** the pending "Permission updates requested" state on the existing Vercel GitHub App installation is still untouched, flagged for Mohan's own review (though it no longer blocks new connections — see below). ~~The GitHub↔Vercel auto-deploy connection is still not fully working~~ — **resolved 2026-09-29, see below.**
+
+## Session log: 2026-09-29 — GitHub account restriction lifted, auto-deploy connected, registry-publishing prep (validation only, not submitted)
+
+**GitHub account restriction fully resolved.** GitHub Support closed Ticket 4801272 with: *"Sometimes our abuse detecting systems highlight accounts that need to be manually reviewed. We've cleared the restrictions from your account, so you have full access to GitHub again."* This is a full resolution, not the earlier "selective, new-authorizations-only" partial state observed mid-ticket. Verified empirically: opened Vercel's Git settings for `thc-mindfulness-mcp`, clicked "GitHub" under Connected Git Repository, the previously-401'ing `git-namespaces` API call succeeded, the repo list loaded, and clicking "Connect" on `mohanagc/thc-mindfulness-mcp` completed instantly ("Connected just now"). **This repo now has a working GitHub→Vercel auto-deploy connection** — future pushes to `main` will deploy automatically; manual `vercel --prod` is no longer required (though it still works as a fallback).
+
+**Registry publishing strategy changed: DNS domain authentication instead of GitHub OAuth.** To further minimize GitHub account risk (independent of the above resolution — this is a standing policy choice, not a reaction to a still-open problem), the Official MCP Registry publishing plan now uses **DNS domain verification** against `theholisticcare.com`, not GitHub OAuth. This changes the server's registry namespace from the GitHub-identity-owned `io.github.mohanagc/thc-open-mindfulness` to the domain-owned `com.theholisticcare/open-mindfulness`. See the rewritten "Publishing strategy" section at the top of `REGISTRY-PUBLISHING.md` for the full decision record (namespace, auth method, no npm package, manual-publish-only, no GitHub Actions auto-publish).
+
+**`server.json` updated to this strategy and to the current registry schema version:**
+
+```json
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.theholisticcare/open-mindfulness",
+  "title": "THC Open Mindfulness MCP",
+  "description": "Read-only mindfulness games, guided practices, research, glossary and PanchaVikas resources.",
+  "version": "1.0.0",
+  "websiteUrl": "https://www.theholisticcare.com/developers",
+  "repository": {
+    "url": "https://github.com/mohanagc/thc-mindfulness-mcp",
+    "source": "github",
+    "id": "1392379972"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.theholisticcare.com/mcp"
+    }
+  ]
+}
+```
+
+Changes from the previous `server.json`: `$schema` bumped from the `2025-09-29` schema URL to `2025-12-11`; `name` changed from `io.github.mohanagc/thc-open-mindfulness` to `com.theholisticcare/open-mindfulness` (DNS-verified namespace, per the strategy above); added `title` (new field, human-readable display name distinct from `name`); `description` shortened to a plain one-line summary; added `repository.id` (`"1392379972"`, the stable numeric GitHub repository ID — metadata identifying which repo this is, not an authentication credential; filling it in does not authenticate anything or grant registry access to GitHub). `version` unchanged (`1.0.0`, still matches `package.json`). `remotes` unchanged (`streamable-http` at `https://mcp.theholisticcare.com/mcp`).
+
+**Validation performed:**
+
+1. `npm run validate:registry` (this repo's own offline structural check, `scripts/validate-registry.mjs`) — **passed, zero failures**:
+   ```
+   ✓ "name" present: com.theholisticcare/open-mindfulness
+   ✓ "description" present: Read-only mindfulness games, guided practices, research, glossary and PanchaVikas resources.
+   ✓ "version" present: 1.0.0
+   ✓ "name" matches the namespaced "<namespace>/<name>" shape.
+   ✓ "repository.url" present: https://github.com/mohanagc/thc-mindfulness-mcp
+   ✓ "repository.source" present: github
+   ✓ remotes[0].type: streamable-http
+   ✓ remotes[0].url: https://mcp.theholisticcare.com/mcp
+   ✓ version matches package.json (1.0.0).
+   server.json passed structural validation.
+   ```
+2. `node -e "require('./server.json')"` — confirmed valid JSON, all 8 expected top-level keys present.
+
+**Could NOT run the real official `mcp-publisher` CLI in this sandbox** (`mcp-publisher --help` / `mcp-publisher validate server.json`) — genuine environment limitation, not skipped:
+- The official CLI is a Go binary distributed **only** via GitHub Releases (`github.com/modelcontextprotocol/registry`) — it is **not published to npm** (confirmed: no `@modelcontextprotocol/publisher` or equivalent scoped package exists on the npm registry).
+- This sandbox's outbound proxy allows plain `github.com` (HTTP 200) but blocks `objects.githubusercontent.com` (where release binary downloads actually redirect to), `raw.githubusercontent.com`, `api.github.com`, and `registry.modelcontextprotocol.io`/`static.modelcontextprotocol.io` entirely (all return `403 from proxy after CONNECT`) — so the release `.tar.gz` could not be downloaded by any method tried (`curl`, the sandbox's `web_fetch` tool), and even the plain-text `checksums.txt` GoReleaser publishes alongside each release came back empty for the same reason.
+- `go install` was considered as a fallback but Go is not installed, and installing it via `apt-get` failed with `Permission denied` on the dpkg lock (this sandbox user has no root/sudo access).
+- **A superficially similar npm package literally named `mcp-publisher` (v0.4.2) does exist on npm — this was checked and explicitly rejected.** It is an unrelated, unofficial tool (description in Russian: a Playwright browser-automation tool for "auto-publishing content on any platform," by a third-party maintainer with no connection to the MCP project). Installing or running it would be a real, unnecessary security risk (arbitrary browser automation of unknown scope) for a name-collision package that has nothing to do with the Official MCP Registry. **It was not installed.**
+
+**Resolved 2026-09-29, same day, by Mohan on his own machine (real internet access):**
+
+1. Downloaded `mcp-publisher_windows_amd64.tar.gz` **v1.8.1** directly from `https://github.com/modelcontextprotocol/registry/releases/tag/v1.8.1` (the newest release as of this date — v1.8.1, not the v1.7.9 that was the latest visible from the sandbox's limited fetch earlier the same day).
+2. **Independently verified the SHA-256 checksum against GitHub's own release-asset listing before extracting anything**: `sha256:399ad0d6e00a50812b563a71d8bfbff5160c085e6b13aac6ec083d98d5ff7c45` — confirmed by both GitHub's own displayed hash on the release page and `Get-FileHash` on the downloaded file. Match confirmed.
+3. Extracted to `E:\Tools\mcp-publisher\` (`mcp-publisher.exe`, `LICENSE`, `README`).
+4. Ran `.\mcp-publisher.exe --help` — confirmed the real CLI, printed the expected command list: `init`, `login`, `logout`, `publish`, `status`, `validate`.
+5. Ran `.\mcp-publisher.exe validate "E:\thc-mindfulness-mcp\server.json"` — **result:**
+   ```
+   Validating against https://registry.modelcontextprotocol.io...
+   ✅ server.json is valid
+   ```
+   This validated against the **live, current official registry schema** (not just an offline shape check) — the strongest confirmation available short of actually publishing. The DNS-auth namespace change (`com.theholisticcare/open-mindfulness`), the schema version bump, and every other field in `server.json` are all confirmed correct and accepted by the real registry as of 2026-09-29.
+
+Only `--help` and `validate` were run in the sandbox-limited portion of this session. No `login`, `login github`, `login dns`, or `publish` was run there. No DNS TXT record or key pair was generated in the sandbox. Nothing was committed or pushed to GitHub as part of that step.
+
+## Session log continued, same day (2026-09-29) — DNS domain verification and publish, completed by Mohan on his own machine
+
+Mohan carried this through to completion himself, step by step, each one confirmed before the next:
+
+1. **Key generated.** `openssl genpkey -algorithm Ed25519 -out key.pem`, run in Git Bash (OpenSSL 3.5.4 — confirmed present in Git Bash even though the plain PowerShell prompt didn't have it on `PATH`). Saved to `E:\THC-private-keys\mcp-registry\key.pem`, **outside** this repo, never committed.
+2. **Public key derived and added to DNS.** `openssl pkey -in key.pem -pubout -outform DER | tail -c 32 | base64` → `v=MCPv1; k=ed25519; p=IgKI9kNiSeEv2GmZTI7/6QT6wgVTLvt87V9RC/WkVuE=`. Added as a **new, additive** TXT record (`Name: @`) in Cloudflare — every existing SPF/DKIM/DMARC/Google-site-verification/Vercel-domain-verify TXT record on `theholisticcare.com` was left untouched (confirmed by screenshot of the full DNS record list before and after). Confirmed publicly resolving via `Resolve-DnsName theholisticcare.com -Type TXT`.
+3. **`mcp-publisher login dns --help` checked first**, specifically to see if a file-based key option existed as a safer alternative to a raw-hex CLI argument. It doesn't — `-private-key` only accepts a hex string, no `-private-key-file`. Given that constraint, the private key was extracted using the same DER-slicing technique already proven safe for the public key (`openssl pkey -in key.pem -outform DER | tail -c 32 | od -An -tx1 | tr -d ' \n'` — 64 hex chars, confirmed by length check before use) rather than the more fragile `openssl pkey ... -text | grep -A3 "priv:"` text-parsing approach from the original plan, and the whole extract-and-login sequence was wrapped in `set +o history` / `set -o history` plus an explicit `unset` afterward, so the raw private key never touched Bash history.
+4. **DNS login succeeded:**
+   ```
+   Logging in with dns...
+   Signing in process using key algorithm ed25519
+   Expected proof record:
+   v=MCPv1; k=ed25519; p=IgKI9kNiSeEv2GmZTI7/6QT6wgVTLvt87V9RC/WkVuE=
+   ✓ Successfully logged in
+   ```
+5. **Final `validate` re-run, clean:** `✅ server.json is valid` against the live registry, same as before.
+6. **Published:**
+   ```
+   Publishing to https://registry.modelcontextprotocol.io...
+   ✓ Successfully published
+   ✓ Server com.theholisticcare/open-mindfulness version 1.0.0
+   ```
+
+**`com.theholisticcare/open-mindfulness` v1.0.0 is now live on the Official MCP Registry**, authenticated entirely via DNS domain ownership. No GitHub OAuth, no GitHub App installation, no GitHub issue/PR/fork/tag/release/workflow was created at any point in this entire registry-publishing arc.
+
+**Still to do:** one single consolidated commit/push of `server.json`, `REGISTRY-PUBLISHING.md`, and `HANDOFF.md` (this file) to `github.com/mohanagc/thc-mindfulness-mcp` — deliberately held back until publish succeeded, to avoid generating multiple small GitHub events during an in-progress step. Also worth doing once convenient: confirm the listing shows up at the registry's public server-lookup UI/API from a real browser (the sandbox that prepared this work has no route to `registry.modelcontextprotocol.io`, so that specific check needs to happen from a machine with normal internet access). And: **back up `E:\THC-private-keys\mcp-registry\key.pem` securely and keep it somewhere durable** — the same key will be needed to publish any future version update to this server, and it exists nowhere else (it was never uploaded, transmitted, or copied into this repo).
 
 ## Content and security boundaries (recap — see SECURITY.md and LICENSING.md for full detail)
 
