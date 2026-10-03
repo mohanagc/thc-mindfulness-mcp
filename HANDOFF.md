@@ -296,3 +296,12 @@ Mohan carried this through to completion himself, step by step, each one confirm
 - No premium content, no private PanchaVikas curriculum, no user data.
 - No writes. No LLM calls made by this server itself. No arbitrary web access — only a fixed, small set of `api.theholisticcare.com` routes.
 - Code is MIT; content returned by the tools is Copyright © The Holistic Care, all rights reserved unless stated otherwise (never Creative Commons).
+
+---
+
+## 2026-10-03 — Consistency audit follow-up
+
+Audited against live production: tools/resources/endpoints/registry id (`com.theholisticcare/open-mindfulness`)
+unchanged and consistent with /developers and the MCP landing page; no stale ID, count, or Sanity-ID text
+found in src/README. Only fix: contact email mohan@ -> info@theholisticcare.com in README.md, SECURITY.md and
+src/lib/constants.ts to match the REST API repo. Tool schemas untouched. tsc clean.

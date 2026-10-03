@@ -140,7 +140,7 @@ This project deploys to [Vercel](https://vercel.com) as a standard Next.js App R
 
 ## Security
 
-See [SECURITY.md](./SECURITY.md) for the full write-up. In short: no secrets, no writes, no direct Sanity/database access, SSRF-hardened outbound requests, Host/Origin header validation on the HTTP transport, and a stateless request model. Report a vulnerability to mohan@theholisticcare.com rather than opening a public issue.
+See [SECURITY.md](./SECURITY.md) for the full write-up. In short: no secrets, no writes, no direct Sanity/database access, SSRF-hardened outbound requests, Host/Origin header validation on the HTTP transport, and a stateless request model. Report a vulnerability to info@theholisticcare.com rather than opening a public issue.
 
 ## Licensing
 

@@ -22,7 +22,7 @@ export const MCP_REPO_URL = "https://github.com/mohanagc/thc-mindfulness-mcp";
 export const MCP_PRODUCTION_URL = "https://mcp.theholisticcare.com/mcp";
 
 /** Security/support contact, reused from the REST API project rather than invented fresh. */
-export const CONTACT_EMAIL = "mohan@theholisticcare.com";
+export const CONTACT_EMAIL = "info@theholisticcare.com";
 
 export const SERVER_NAME = "thc-open-mindfulness";
 export const SERVER_TITLE = "THC Open Mindfulness MCP";

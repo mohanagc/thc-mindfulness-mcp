@@ -4,7 +4,7 @@
 
 If you find a security issue in this MCP server — a way to bypass its read-only guarantee, exfiltrate data it should not have access to, cause it to make requests to an attacker-controlled host, or anything else security-relevant — please report it privately rather than opening a public GitHub issue.
 
-**Contact:** mohan@theholisticcare.com
+**Contact:** info@theholisticcare.com
 
 Please include:
 - A description of the issue and its potential impact
