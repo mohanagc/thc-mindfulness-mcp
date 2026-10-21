@@ -12,6 +12,9 @@
  *       no per-item detail route exists upstream. GET /v1/panchavikas/resources
  *       (the one, fixed, non-paginated list) and match by the resource's own
  *       stable `id` (e.g. "PV-pathway-jal"), since that family has no slug field.
+ *   podcast_episode   -> GET /v1/podcast/episodes/{id}, where id is the
+ *       episode's stable id (e.g. "PC-S02E03-EN"). The slug is shared by the
+ *       English and Hindi versions, so it cannot identify one episode.
  *
  * A private or genuinely missing resource behave IDENTICALLY here (404 ->
  * not_found) — this endpoint never distinguishes "exists but is private" from
@@ -25,6 +28,7 @@ import {
   fromGame,
   fromGlossaryTerm,
   fromPanchaVikas,
+  fromPodcastEpisode,
   fromPractice,
   fromResearch,
   type McpResource,
@@ -35,6 +39,7 @@ import type {
   ApiGlossaryTerm,
   ApiMindfulnessGame,
   ApiPanchaVikasResource,
+  ApiPodcastEpisode,
   ApiPractice,
   ApiResearchCitation,
   ApiSuccessDetail,
@@ -53,7 +58,8 @@ export const getMindfulnessResourceTool = {
       "For blog/mindfulness_game/guided_practice/research/glossary, `identifier` is " +
       "the resource's slug. For panchavikas_pathway/panchavikas_download, " +
       "`identifier` is the resource's stable id (e.g. 'PV-pathway-jal'), since that " +
-      "family has no slug. A resource that does not exist and a resource that exists " +
+      "family has no slug. For podcast_episode, `identifier` is the episode id (e.g. " +
+      "'PC-S02E03-EN'). A resource that does not exist and a resource that exists " +
       "but is private behave identically here (a clean not-found result) — this tool " +
       "never confirms or denies the existence of private content.",
     inputSchema: getMindfulnessResourceInput,
@@ -102,6 +108,12 @@ export const getMindfulnessResourceTool = {
         const match = data.data.find((r) => r.id === input.identifier && r.type === input.resource_type);
         if (!match) throw notFound("PanchaVikas resource");
         return fromPanchaVikas(match);
+      }
+      case "podcast_episode": {
+        const { data } = await getJson<ApiSuccessDetail<ApiPodcastEpisode>>(
+          `/v1/podcast/episodes/${encodeURIComponent(input.identifier)}`,
+        );
+        return fromPodcastEpisode(data.data);
       }
       default: {
         // Exhaustiveness guard — the Zod enum already prevents reaching here.

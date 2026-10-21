@@ -11,6 +11,7 @@ import { findGuidedPracticesTool } from "./findGuidedPractices";
 import { searchMindfulnessResearchTool } from "./searchMindfulnessResearch";
 import { lookupMindfulnessTermTool } from "./lookupMindfulnessTerm";
 import { findPanchavikasResourcesTool } from "./findPanchavikasResources";
+import { findPodcastEpisodesTool } from "./findPodcastEpisodes";
 
 /** Shared output schema for every list-returning tool. */
 const resourceOutputSchema = z.object({
@@ -161,7 +162,7 @@ function handleToolError(toolName: string, started: number, err: unknown) {
   };
 }
 
-/** Registers all seven V1 tools on a freshly constructed McpServer instance. */
+/** Registers all eight tools on a freshly constructed McpServer instance. */
 export function registerAllTools(server: McpServer): void {
   registerListTool(server, searchMindfulnessResourcesTool);
   registerSingleTool(server, getMindfulnessResourceTool);
@@ -170,4 +171,5 @@ export function registerAllTools(server: McpServer): void {
   registerListTool(server, searchMindfulnessResearchTool);
   registerSingleTool(server, lookupMindfulnessTermTool);
   registerListTool(server, findPanchavikasResourcesTool);
+  registerListTool(server, findPodcastEpisodesTool);
 }

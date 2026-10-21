@@ -26,6 +26,7 @@ const EXPECTED_TOOL_NAMES = [
   "search_mindfulness_research",
   "lookup_mindfulness_term",
   "find_panchavikas_resources",
+  "find_podcast_episodes",
 ].sort();
 
 const EXPECTED_RESOURCE_URIS = [
@@ -74,7 +75,7 @@ async function main() {
     const { tools } = await client.listTools();
     const names = tools.map((t: { name: string }) => t.name).sort();
     check(
-      "tools/list returns exactly the 7 documented tools",
+      "tools/list returns exactly the 8 documented tools",
       JSON.stringify(names) === JSON.stringify(EXPECTED_TOOL_NAMES),
       `got: ${JSON.stringify(names)}`,
     );
@@ -96,6 +97,31 @@ async function main() {
       "tools/call search_mindfulness_resources succeeds against live upstream API",
       searchResult.isError !== true,
       `isError: ${searchResult.isError}, content: ${JSON.stringify(searchResult.content).slice(0, 300)}`,
+    );
+
+    // --- 3b. Podcast episodes (added 2026-10-21) ---
+    const podcastResult = await client.callTool({
+      name: "find_podcast_episodes",
+      arguments: { language: "en", season: 1, limit: 3 },
+    });
+    const podcastStructured = podcastResult.structuredContent as { count?: number; results?: Array<{ id?: string; type?: string }> } | undefined;
+    check(
+      "tools/call find_podcast_episodes returns English season 1 episodes",
+      podcastResult.isError !== true &&
+        (podcastStructured?.count ?? 0) > 0 &&
+        (podcastStructured?.results ?? []).every((r) => r.type === "podcast_episode" && /^PC-S01E\d{2}-EN$/.test(r.id ?? "")),
+      `content: ${JSON.stringify(podcastResult.content).slice(0, 300)}`,
+    );
+
+    const episodeResult = await client.callTool({
+      name: "get_mindfulness_resource",
+      arguments: { resource_type: "podcast_episode", identifier: "PC-S01E01-EN" },
+    });
+    const episodeStructured = episodeResult.structuredContent as { found?: boolean; resource?: { id?: string } } | undefined;
+    check(
+      "tools/call get_mindfulness_resource fetches podcast episode PC-S01E01-EN",
+      episodeResult.isError !== true && episodeStructured?.found === true && episodeStructured.resource?.id === "PC-S01E01-EN",
+      `content: ${JSON.stringify(episodeResult.content).slice(0, 300)}`,
     );
 
     // --- 4. A resources/read call ---

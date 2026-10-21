@@ -23,7 +23,8 @@ export default function Home() {
       <p style={{ color: "rgba(255,255,255,0.72)" }}>
         A public, read-only Model Context Protocol server exposing {PROVIDER_NAME}&apos;s
         approved public mindfulness resources — games, free guided practices, research
-        summaries, a glossary, and the public PanchaVikas framework overview.
+        summaries, a glossary, the public PanchaVikas framework overview, and episodes of
+        The Holistic Care Podcast in English and Hindi.
       </p>
 
       <dl style={{ marginTop: 32 }}>

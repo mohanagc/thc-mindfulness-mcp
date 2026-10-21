@@ -34,6 +34,7 @@ const EXPECTED_TOOL_NAMES = [
   "search_mindfulness_research",
   "lookup_mindfulness_term",
   "find_panchavikas_resources",
+  "find_podcast_episodes",
 ].sort();
 
 const EXPECTED_RESOURCE_URIS = [
@@ -59,7 +60,7 @@ async function withConnectedClient<T>(fn: (client: Client) => Promise<T>): Promi
   }
 }
 
-test("contract: server advertises exactly the 7 documented tools, no more, no fewer", async () => {
+test("contract: server advertises exactly the 8 documented tools, no more, no fewer", async () => {
   await withConnectedClient(async (client) => {
     const { tools } = await client.listTools();
     const names = tools.map((t: { name: string }) => t.name).sort();

@@ -71,7 +71,7 @@ async function fetchWithTimeout(url: string, attempt: number): Promise<Response>
       method: "GET",
       headers: {
         Accept: "application/json",
-        "User-Agent": "thc-mindfulness-mcp/1.0.0 (+https://mcp.theholisticcare.com)",
+        "User-Agent": "thc-mindfulness-mcp/1.1.0 (+https://mcp.theholisticcare.com)",
       },
       signal: controller.signal,
       // Never forward cookies/credentials — this is a public, unauthenticated API.

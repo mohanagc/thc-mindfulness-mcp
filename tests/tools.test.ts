@@ -13,9 +13,10 @@ import { findGuidedPracticesTool } from "../src/tools/findGuidedPractices.js";
 import { searchMindfulnessResearchTool } from "../src/tools/searchMindfulnessResearch.js";
 import { lookupMindfulnessTermTool } from "../src/tools/lookupMindfulnessTerm.js";
 import { findPanchavikasResourcesTool } from "../src/tools/findPanchavikasResources.js";
+import { findPodcastEpisodesTool } from "../src/tools/findPodcastEpisodes.js";
 import { AppError } from "../src/lib/errors.js";
 import { jsonResponse, successDetail, successList, withMockFetch } from "./testUtils.js";
-import type { ApiPanchaVikasResource, ApiResource } from "../src/types.js";
+import type { ApiPanchaVikasResource, ApiPodcastEpisode, ApiResource } from "../src/types.js";
 
 // ---------------------------------------------------------------------------
 // search_mindfulness_resources
@@ -435,6 +436,111 @@ test("find_panchavikas_resources: never returns anything beyond the fixed public
       // content must still only ever be able to match the public list above.
       const results = await findPanchavikasResourcesTool.handler({ query: "216-session curriculum teacher script" } as any);
       assert.equal(results.length, 0);
+    },
+  );
+});
+
+// ---------------------------------------------------------------------------
+// find_podcast_episodes
+// ---------------------------------------------------------------------------
+
+function podcastFixture(overrides: Partial<ApiPodcastEpisode> = {}): ApiPodcastEpisode {
+  return {
+    id: "PC-S01E01-EN",
+    type: "podcast_episode",
+    slug: "why-children-get-angry",
+    title: "Why Do Children Get Angry?",
+    short_title: "Children and Anger",
+    language: "en",
+    season_number: 1,
+    season_title: "Big Feelings",
+    episode_number: 1,
+    summary: "Anger is a signal, not misbehaviour.",
+    key_question: "What is my child's anger telling me?",
+    audience: "Parents",
+    duration_iso: "PT2M24S",
+    duration_seconds: 144,
+    release_date: "2026-10-10",
+    url: "https://www.theholisticcare.com/podcast/en/season-1/why-children-get-angry",
+    youtube_url: "https://www.youtube.com/watch?v=abc123",
+    alternate_language_id: "PC-S01E01-HI",
+    updated_at: "2026-10-21T00:00:00Z",
+    ...overrides,
+  };
+}
+
+test("find_podcast_episodes: passes language/season to /v1/podcast/episodes and normalizes", async () => {
+  let capturedUrl: string | undefined;
+  await withMockFetch(
+    async (url) => {
+      capturedUrl = String(url);
+      return jsonResponse(200, successList([podcastFixture()]));
+    },
+    async () => {
+      const results = await findPodcastEpisodesTool.handler({ language: "en", season: 1 } as any);
+      assert.equal(results.length, 1);
+      const r = results[0]!;
+      assert.equal(r.id, "PC-S01E01-EN");
+      assert.equal(r.type, "podcast_episode");
+      assert.equal(r.language, "en");
+      assert.equal(r.duration_minutes, 2);
+      assert.equal(r.canonical_url, "https://www.theholisticcare.com/podcast/en/season-1/why-children-get-angry");
+      assert.equal(r.video_url, "https://www.youtube.com/watch?v=abc123");
+      assert.equal(r.access, "free");
+      assert.ok(!("transcript" in r), "a transcript must never appear on a result");
+    },
+  );
+  const parsed = new URL(capturedUrl!);
+  assert.equal(parsed.pathname, "/v1/podcast/episodes");
+  assert.equal(parsed.searchParams.get("lang"), "en");
+  assert.equal(parsed.searchParams.get("season"), "1");
+});
+
+test("find_podcast_episodes: query matches every word across title, summary and key question", async () => {
+  const fixture = [
+    podcastFixture(),
+    podcastFixture({ id: "PC-S01E02-EN", episode_number: 2, title: "Helping a Shy Child", short_title: null, summary: "Shyness is temperament.", key_question: "Should I push my shy child?" }),
+  ];
+  await withMockFetch(
+    async () => jsonResponse(200, successList(fixture)),
+    async () => {
+      const results = await findPodcastEpisodesTool.handler({ query: "anger signal" } as any);
+      assert.deepEqual(results.map((r) => r.id), ["PC-S01E01-EN"]);
+      const none = await findPodcastEpisodesTool.handler({ query: "anger shy" } as any);
+      assert.equal(none.length, 0);
+    },
+  );
+});
+
+test("get_mindfulness_resource: podcast_episode routes to /v1/podcast/episodes/{id}", async () => {
+  let capturedUrl: string | undefined;
+  await withMockFetch(
+    async (url) => {
+      capturedUrl = String(url);
+      return jsonResponse(200, successDetail(podcastFixture({ id: "PC-S02E03-HI", language: "hi" })));
+    },
+    async () => {
+      const r = await getMindfulnessResourceTool.handler({ resource_type: "podcast_episode", identifier: "PC-S02E03-HI" } as any);
+      assert.equal(r.id, "PC-S02E03-HI");
+      assert.deepEqual(r.tags, ["Hindi", "Season 1"]);
+    },
+  );
+  assert.equal(new URL(capturedUrl!).pathname, "/v1/podcast/episodes/PC-S02E03-HI");
+});
+
+test("search_mindfulness_resources: resource_type 'glossary' matches normalized glossary_term results", async () => {
+  const fixture: ApiResource[] = [
+    {
+      id: "glossary:prana", title: "Prana", slug: "prana", type: "glossary", summary: "Life force.",
+      category: "yoga", tags: null, audiences: null, age_min: null, age_max: null, duration_minutes: null,
+      skills: null, access: "free", source_url: "https://www.theholisticcare.com/glossary/prana", updated_at: null,
+    },
+  ];
+  await withMockFetch(
+    async () => jsonResponse(200, successList(fixture)),
+    async () => {
+      const results = await searchMindfulnessResourcesTool.handler({ query: "prana", resource_type: "glossary" } as any);
+      assert.deepEqual(results.map((r) => r.id), ["glossary:prana"]);
     },
   );
 });

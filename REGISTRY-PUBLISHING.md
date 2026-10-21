@@ -30,7 +30,7 @@ The `repository` field in `server.json` still references the GitHub repo (`https
 ## Before you actually submit anywhere
 
 1. **Re-verify `server.json` against the live schema.** Registry schemas evolve; `scripts/validate-registry.mjs` checks the shape this project was built against, not necessarily what the registry currently enforces. Check `https://registry.modelcontextprotocol.io` (or wherever the Official Registry's current docs live) for the current `server.schema.json` URL and any new required fields.
-2. **Confirm the production endpoint is live and healthy** — `curl https://mcp.theholisticcare.com/health` should return `{"status":"ok",...}`, and an MCP Inspector session against `https://mcp.theholisticcare.com/mcp` should list all 7 tools and 5 resources with no errors (see `README.md`'s "Testing with MCP Inspector" section).
+2. **Confirm the production endpoint is live and healthy** — `curl https://mcp.theholisticcare.com/health` should return `{"status":"ok",...}`, and an MCP Inspector session against `https://mcp.theholisticcare.com/mcp` should list all 8 tools and 5 resources with no errors (see `README.md`'s "Testing with MCP Inspector" section).
 3. **Bump `version` in both `package.json` and `server.json` together** if anything has changed since this was written — `validate:registry` will fail loudly if they drift.
 
 ## Official MCP Registry (registry.modelcontextprotocol.io) — DNS authentication path

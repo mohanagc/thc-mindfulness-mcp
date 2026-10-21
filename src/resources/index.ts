@@ -31,8 +31,9 @@ Source code: ${MCP_REPO_URL}
 This is a public, read-only Model Context Protocol server exposing a curated
 set of ${PROVIDER_NAME}'s approved public mindfulness resources: interactive
 mindfulness games, free guided audio practices, plain-language research
-summaries, a glossary of mindfulness/yoga/nonduality terms, and the public
-overview of the PanchaVikas child-development framework.
+summaries, a glossary of mindfulness/yoga/nonduality terms, the public
+overview of the PanchaVikas child-development framework, and episodes of
+The Holistic Care Podcast in English and Hindi.
 
 It never connects to ${PROVIDER_NAME}'s content management system directly.
 Every tool call in this server is served by the same public REST API anyone
@@ -64,6 +65,10 @@ the categories the underlying REST API organizes its public content into:
   and public downloadable guide for the PanchaVikas five-element child
   development framework. Private curriculum material is not part of this
   taxonomy and is not accessible through this server.
+- **podcast_episode** — episodes of The Holistic Care Podcast on children's
+  emotional wellbeing, in English and Hindi. Returned as title, summary,
+  duration, release date and links to the episode page and video; the
+  transcript and companion guide stay on the episode page.
 `;
 
 const USAGE_TEXT = `# Usage
@@ -91,7 +96,8 @@ const CONTENT_RIGHTS_TEXT = `# Content rights
   it depends on) is MIT-licensed. You may reuse, adapt, and self-host that
   code freely, per the MIT License terms.
 - **Content.** The mindfulness games, guided practices, research summaries,
-  glossary entries, blog excerpts, and PanchaVikas resources returned BY this
+  glossary entries, blog excerpts, PanchaVikas resources and podcast episode
+  summaries returned BY this
   server are Copyright © ${PROVIDER_NAME}, all rights reserved, unless a
   specific resource explicitly states otherwise. Public read access to this
   content through this MCP server does NOT grant a license to republish,

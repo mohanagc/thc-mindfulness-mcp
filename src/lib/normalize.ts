@@ -13,6 +13,7 @@ import type {
   ApiGlossaryTerm,
   ApiMindfulnessGame,
   ApiPanchaVikasResource,
+  ApiPodcastEpisode,
   ApiPractice,
   ApiResearchCitation,
   ApiResource,
@@ -28,7 +29,8 @@ export interface McpResource {
     | "research"
     | "glossary_term"
     | "panchavikas_pathway"
-    | "panchavikas_download";
+    | "panchavikas_download"
+    | "podcast_episode";
   title: string;
   slug?: string;
   summary?: string;
@@ -40,6 +42,12 @@ export interface McpResource {
   duration_minutes?: number;
   skills?: string[];
   access?: string;
+  /** Podcast episodes only: "en" | "hi". */
+  language?: string;
+  /** Podcast episodes only: ISO date the episode was released. */
+  release_date?: string;
+  /** Podcast episodes only: the YouTube watch URL, when there is one. */
+  video_url?: string;
   source_url?: string;
   canonical_url?: string;
 }
@@ -71,6 +79,7 @@ export function fromUnifiedResource(r: ApiResource): McpResource {
     glossary: "glossary_term",
     panchavikas_pathway: "panchavikas_pathway",
     panchavikas_download: "panchavikas_download",
+    podcast_episode: "podcast_episode",
   };
 
   return omitEmpty<McpResource>({
@@ -187,5 +196,26 @@ export function fromPanchaVikas(p: ApiPanchaVikasResource): McpResource {
     summary: p.summary,
     source_url: p.download_url ?? p.source_url,
     canonical_url: p.source_url,
+  });
+}
+
+export function fromPodcastEpisode(e: ApiPodcastEpisode): McpResource {
+  return omitEmpty<McpResource>({
+    id: e.id,
+    type: "podcast_episode",
+    title: e.title,
+    slug: e.slug,
+    summary: e.summary ?? undefined,
+    category: e.season_title ?? undefined,
+    tags: [e.language === "hi" ? "Hindi" : "English", `Season ${e.season_number}`],
+    audiences: e.audience ? [e.audience] : undefined,
+    duration_minutes:
+      e.duration_seconds != null ? Math.max(1, Math.round(e.duration_seconds / 60)) : undefined,
+    access: "free",
+    language: e.language,
+    release_date: e.release_date ?? undefined,
+    video_url: e.youtube_url ?? undefined,
+    source_url: e.url,
+    canonical_url: e.url,
   });
 }

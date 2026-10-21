@@ -1,5 +1,5 @@
 /**
- * Zod input schemas for all seven MCP tools, built directly against the live
+ * Zod input schemas for all eight MCP tools, built directly against the live
  * OpenAPI contract at https://api.theholisticcare.com/openapi/openapi.yaml.
  */
 import { z } from "zod";
@@ -8,6 +8,7 @@ import {
   GAME_SKILLS,
   GLOSSARY_PILLARS,
   PANCHAVIKAS_ELEMENTS,
+  PODCAST_LANGUAGES,
   PRACTICE_CATEGORIES,
   UNIFIED_RESOURCE_TYPES,
   WHITEPAPER_STUDY_TYPES,
@@ -51,7 +52,8 @@ export const getMindfulnessResourceInput = z.object({
     .max(160)
     .describe(
       "The resource's slug for blog/mindfulness_game/guided_practice/research/glossary. " +
-        "The resource's stable id (e.g. 'PV-pathway-jal') for panchavikas_pathway/panchavikas_download.",
+        "The resource's stable id (e.g. 'PV-pathway-jal') for panchavikas_pathway/panchavikas_download. " +
+        "The episode id (e.g. 'PC-S02E03-EN') for podcast_episode.",
     ),
 });
 export type GetMindfulnessResourceInput = z.infer<typeof getMindfulnessResourceInput>;
@@ -100,3 +102,12 @@ export const findPanchavikasResourcesInput = z.object({
   limit,
 });
 export type FindPanchavikasResourcesInput = z.infer<typeof findPanchavikasResourcesInput>;
+
+// Tool 8: find_podcast_episodes
+export const findPodcastEpisodesInput = z.object({
+  query: optionalQuery,
+  language: z.enum(PODCAST_LANGUAGES).optional(),
+  season: z.coerce.number().int().min(1).max(999).optional(),
+  limit,
+});
+export type FindPodcastEpisodesInput = z.infer<typeof findPodcastEpisodesInput>;

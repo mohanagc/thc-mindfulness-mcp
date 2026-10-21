@@ -1,6 +1,6 @@
 # THC Open Mindfulness MCP
 
-A public, read-only [Model Context Protocol](https://modelcontextprotocol.io) server for [The Holistic Care](https://www.theholisticcare.com)'s approved public mindfulness resources — interactive games, free guided audio practices, plain-language research summaries, a glossary, and the public PanchaVikas framework overview.
+A public, read-only [Model Context Protocol](https://modelcontextprotocol.io) server for [The Holistic Care](https://www.theholisticcare.com)'s approved public mindfulness resources — interactive games, free guided audio practices, plain-language research summaries, a glossary, the public PanchaVikas framework overview, and episodes of The Holistic Care Podcast (English and Hindi).
 
 - **Production endpoint:** `https://mcp.theholisticcare.com/mcp` (Streamable HTTP)
 - **No authentication required.** No API key, no OAuth, nothing to sign up for.
@@ -48,17 +48,18 @@ MCP client (Claude, etc.)
 
 ## Tools
 
-All seven tools are read-only, take no destructive action (`readOnlyHint: true`, `destructiveHint: false` in every tool's annotations), and return a small (default 6, max 20) list of normalized resources rather than a bulk dump.
+All eight tools are read-only, take no destructive action (`readOnlyHint: true`, `destructiveHint: false` in every tool's annotations), and return a small (default 6, max 20) list of normalized resources rather than a bulk dump.
 
 | Tool | What it does | Backed by |
 |---|---|---|
-| `search_mindfulness_resources` | Free-text search across every public resource family at once (blog, games, practices, research, glossary, PanchaVikas), with optional `resource_type`/`category`/`audience`/`skill`/`age` filters. | `GET /v1/search`, filtered client-side |
-| `get_mindfulness_resource` | Fetch one specific resource by its type + identifier (slug for most families, stable id for PanchaVikas). | The matching dedicated detail endpoint, e.g. `GET /v1/mindfulness-games/{slug}` |
+| `search_mindfulness_resources` | Free-text search across every public resource family at once (blog, games, practices, research, glossary, PanchaVikas, podcast episodes), with optional `resource_type`/`category`/`audience`/`skill`/`age` filters. | `GET /v1/search`, filtered client-side |
+| `get_mindfulness_resource` | Fetch one specific resource by its type + identifier (slug for most families, stable id for PanchaVikas and podcast episodes, e.g. `PC-S02E03-EN`). | The matching dedicated detail endpoint, e.g. `GET /v1/mindfulness-games/{slug}` |
 | `find_mindfulness_games` | Find interactive mindfulness games, filterable by age, skill, audience, and max duration. | `GET /v1/mindfulness-games` or `GET /v1/search` |
 | `find_guided_practices` | Find free guided audio practices from the Stillness Library (never paid tracks). | `GET /v1/practices` or `GET /v1/search` |
 | `search_mindfulness_research` | Search plain-language research summaries, filterable by topic and study type. | `GET /v1/whitepapers` or `GET /v1/search` |
 | `lookup_mindfulness_term` | Look up one glossary term by name, with an optional pillar filter. | `GET /v1/glossary/{slug}`, falling back to search |
 | `find_panchavikas_resources` | Find public PanchaVikas resources (framework pathways and the public downloadable guide only — never private curriculum). | `GET /v1/panchavikas/resources`, filtered client-side |
+| `find_podcast_episodes` | Find episodes of The Holistic Care Podcast, filterable by `language` (`en`/`hi`), `season` and a free-text `query`. Returns summary, duration, release date, episode page and video link — never the transcript. | `GET /v1/podcast/episodes`, query matched client-side |
 
 Every list-returning tool shares the output shape `{ results: Resource[], count: number }`; `get_mindfulness_resource` and `lookup_mindfulness_term` return `{ found: boolean, resource: Resource | null }`. See each tool's own file under `src/tools/` for its exact Zod input schema and a code comment explaining any filter it cannot apply with full fidelity (documented rather than silently ignored — see the note on `/v1/search`'s narrower parameter set below).
 
@@ -124,7 +125,7 @@ Then connect it to either:
 - `http://localhost:3000/mcp` (a local `npm run dev` instance), or
 - `https://mcp.theholisticcare.com/mcp` (production)
 
-using the "Streamable HTTP" transport option and no authentication. You should see all 7 tools and all 5 resources listed, and be able to call each one interactively.
+using the "Streamable HTTP" transport option and no authentication. You should see all 8 tools and all 5 resources listed, and be able to call each one interactively.
 
 ## Deployment
 

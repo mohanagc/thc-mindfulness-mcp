@@ -57,6 +57,7 @@ export const UNIFIED_RESOURCE_TYPES = [
   "glossary",
   "panchavikas_pathway",
   "panchavikas_download",
+  "podcast_episode",
 ] as const;
 
 export type UnifiedResourceType = (typeof UNIFIED_RESOURCE_TYPES)[number];
@@ -172,6 +173,33 @@ export interface ApiPanchaVikasResource {
   download_url?: string;
 }
 
+/**
+ * GET /v1/podcast/episodes and /v1/podcast/episodes/{id} (added 2026-10-21).
+ * Discovery metadata only: the REST API never exposes the transcript,
+ * companion guide, FAQs or practical-ideas lists.
+ */
+export interface ApiPodcastEpisode {
+  id: string; // "PC-S02E03-EN"
+  type: "podcast_episode";
+  slug: string; // shared by the EN and HI versions; not unique on its own
+  title: string;
+  short_title: string | null;
+  language: "en" | "hi";
+  season_number: number;
+  season_title: string | null;
+  episode_number: number;
+  summary: string | null;
+  key_question: string | null;
+  audience: string | null;
+  duration_iso: string | null;
+  duration_seconds: number | null;
+  release_date: string | null;
+  url: string;
+  youtube_url: string | null;
+  alternate_language_id: string;
+  updated_at: string;
+}
+
 // ---------------------------------------------------------------------------
 // Query param enums the live REST API actually accepts (from the audit)
 // ---------------------------------------------------------------------------
@@ -236,3 +264,6 @@ export const PRACTICE_CATEGORIES = [
 
 /** Casing/identifiers as actually returned by GET /v1/panchavikas/resources. */
 export const PANCHAVIKAS_ELEMENTS = ["prithvi", "jal", "agni", "vayu", "akash"] as const;
+
+/** Languages GET /v1/podcast/episodes accepts as `lang`. */
+export const PODCAST_LANGUAGES = ["en", "hi"] as const;

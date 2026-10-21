@@ -22,7 +22,7 @@ export const searchMindfulnessResourcesTool = {
     description:
       "Free-text search across every public resource family on The Holistic Care " +
       "(blog articles, mindfulness games, free guided practices, research summaries, " +
-      "glossary terms, and public PanchaVikas resources). Use this as the general " +
+      "glossary terms, public PanchaVikas resources, and podcast episodes). Use this as the general " +
       "entry point when a request doesn't clearly belong to one specific family — " +
       "e.g. 'Find something about breathing for anxiety' or 'What has THC published " +
       "about nondual awareness?'. `resource_type`, `category`, `audience`, `skill`, " +
@@ -32,7 +32,7 @@ export const searchMindfulnessResourcesTool = {
       "few or zero results even if matching resources exist outside the searched " +
       "batch — for a guaranteed, fully server-side filtered result within one " +
       "resource family, prefer find_mindfulness_games, find_guided_practices, " +
-      "search_mindfulness_research, or lookup_mindfulness_term instead.",
+      "search_mindfulness_research, lookup_mindfulness_term, or find_podcast_episodes instead.",
     inputSchema: searchMindfulnessResourcesInput,
     annotations: {
       readOnlyHint: true,
@@ -58,7 +58,10 @@ export const searchMindfulnessResourcesTool = {
     let results = data.data.map(fromUnifiedResource);
 
     if (input.resource_type) {
-      results = results.filter((r) => r.type === input.resource_type);
+      // The search API calls the glossary family "glossary"; normalized
+      // resources call it "glossary_term". Compare on the normalized name.
+      const wanted = input.resource_type === "glossary" ? "glossary_term" : input.resource_type;
+      results = results.filter((r) => r.type === wanted);
     }
     if (input.category) {
       results = results.filter((r) => textIncludes(r.category, input.category!));

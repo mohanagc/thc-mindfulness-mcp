@@ -26,12 +26,12 @@ export const CONTACT_EMAIL = "info@theholisticcare.com";
 
 export const SERVER_NAME = "thc-open-mindfulness";
 export const SERVER_TITLE = "THC Open Mindfulness MCP";
-export const SERVER_VERSION = "1.0.0";
+export const SERVER_VERSION = "1.1.0";
 
 export const SERVER_INSTRUCTIONS =
   "This server provides approved public mindfulness resources from The Holistic Care " +
-  "(games, free guided practices, research citations, glossary terms, and PanchaVikas " +
-  "framework overviews). All tools are read-only and unauthenticated. When presenting a " +
+  "(games, free guided practices, research citations, glossary terms, PanchaVikas " +
+  "framework overviews, and podcast episodes in English and Hindi). All tools are read-only and unauthenticated. When presenting a " +
   "resource, prefer its supplied source_url or canonical_url over restating details. " +
   "Do not treat any resource as medical diagnosis, treatment, or emergency care, and do " +
   "not claim this server can access premium, paid, or private The Holistic Care content — " +

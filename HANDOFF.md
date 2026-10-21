@@ -305,3 +305,34 @@ Audited against live production: tools/resources/endpoints/registry id (`com.the
 unchanged and consistent with /developers and the MCP landing page; no stale ID, count, or Sanity-ID text
 found in src/README. Only fix: contact email mohan@ -> info@theholisticcare.com in README.md, SECURITY.md and
 src/lib/constants.ts to match the REST API repo. Tool schemas untouched. tsc clean.
+
+---
+
+## 2026-10-21 — Podcast support (v1.1.0) and content-inventory audit
+
+**What changed**
+- New tool `find_podcast_episodes` (`src/tools/findPodcastEpisodes.ts`): wraps the REST API's new
+  `GET /v1/podcast/episodes` (`lang` en|hi, `season`, paginated). `query` is matched client-side, every
+  word against title/short title/summary/key question/season title. Server now has **8 tools, 5 resources**.
+- `podcast_episode` added to `UNIFIED_RESOURCE_TYPES`, so `search_mindfulness_resources` can filter on it
+  and `get_mindfulness_resource` accepts `resource_type: "podcast_episode"` with an id like `PC-S02E03-EN`
+  (routes to `GET /v1/podcast/episodes/{id}`). The slug is shared by the EN and HI versions, so ids, not slugs.
+- `McpResource` gained three optional podcast-only fields: `language`, `release_date`, `video_url`.
+- Transcripts and companion guides are never exposed (the REST API does not return them).
+- Fixed a pre-existing bug: `search_mindfulness_resources` with `resource_type: "glossary"` always returned
+  nothing, because results are normalized to `glossary_term`. Now compared on the normalized name.
+- Descriptions, server instructions, `thc://about`, `thc://taxonomy`, `thc://content-rights`, landing page,
+  README and REGISTRY-PUBLISHING updated. Version bumped 1.0.0 -> 1.1.0 (package.json, lock, server.json,
+  SERVER_VERSION, User-Agent).
+- Tests: contract test expects 8 tools; 4 new unit tests (podcast list, query, detail routing, glossary fix).
+  Smoke test now also calls `find_podcast_episodes` and fetches `PC-S01E01-EN`.
+
+**Verified (cloud sandbox):** `tsc --noEmit` clean, `npm test` 58/58 pass, `validate:registry` ok,
+`next build` ok. `eslint` fails to load `eslint-config-next` with TypeScript 7 (pre-existing, unrelated).
+
+**Deploy order:** the REST API must be deployed first (the podcast endpoints are new there).
+
+**Registry:** the Official MCP Registry still lists v1.0.0. To publish v1.1.0, re-run `mcp-publisher login dns`
++ `mcp-publisher publish` with the key in `E:\THC-private-keys\mcp-registry\` (optional; the live endpoint
+already serves the new tool regardless).
+

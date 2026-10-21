@@ -1,7 +1,7 @@
 /**
  * Builds a fresh McpServer instance for one serving unit (one HTTP request
  * under createMcpHandler's stateless model). Deliberately cheap to construct
- * — no I/O happens here, only registration of the seven tools and five
+ * — no I/O happens here, only registration of the eight tools and five
  * resources against in-memory definitions.
  */
 import { McpServer } from "@modelcontextprotocol/server";
