@@ -24,7 +24,8 @@ export function buildMcpServer(): McpServer {
       description:
         "Read-only MCP server providing structured mindfulness games, free guided " +
         "practices, research resources, glossary concepts, PanchaVikas public " +
-        "resources and cross-resource discovery from The Holistic Care.",
+        "resources, podcast episodes (English and Hindi) and cross-resource discovery " +
+        "from The Holistic Care.",
       websiteUrl: MAIN_SITE_URL,
     },
     {
